@@ -1,0 +1,129 @@
+CREATE 
+(A:Female { name : "Alice"}),
+(B:Male { name : "Bob"}), 
+(F:Male { name: "Fred"}),
+(K:Female { name : "Karthike"}),
+(D:Female { name : "Dhwanishe"}),
+(J:Male { name : "Jigar"}),
+(AB:Male { name : "Abhishek"}),
+(S:Female { name : "Snigdha"}),
+(A)-[:Parent_Of]->(B), 
+(B)-[:Parent_Of]->(K),
+(A)-[:Parent_Of]->(D), 
+(D)-[:Parent_Of]->(A),
+(A)-[:Parent_Of]->(F), 
+(A)-[:Parent_Of]->(S),
+(D)-[:Like]->(A),
+(K)-[:Like]->(D),
+(AB)-[:Like]->(A),
+(A)-[:Like]->(J),
+(A)-[:Like]->(A),
+(A)-[:Like]->(D),
+(J)-[:Like]->(AB),
+(S)-[:Like]->(K),
+(F)-[:Like]->(A);
+
+
+CREATE 
+(A:Male { name : "Alex"}),
+(B:Male { name : "Bob"}), 
+(F:Male { name: "Fred"}),
+(K:Female { name : "Karthike"}),
+(D:Female { name : "Dhwanishe"}),
+(J:Male { name : "Jigar"}),
+(AB:Male { name : "Abhishek"}),
+(S:Female { name : "Snigdha"}),
+(X:Male { name : "X"}),
+(Y:Male { name : "Y"}),
+(Z:Male { name : "Z"}),
+(A)-[:Parent_Of]->(B), 
+(B)-[:Parent_Of]->(K),  
+(K)-[:Parent_Of]->(X), 
+(X)-[:Parent_Of]->(Y),  
+(Y)-[:Parent_Of]->(Z),
+(A)-[:Parent_Of]->(D), 
+(A)-[:Parent_Of]->(F), 
+(A)-[:Parent_Of]->(S),
+(D)-[:Like]->(A),
+(K)-[:Like]->(D),
+(AB)-[:Like]->(A),
+(A)-[:Like]->(J),
+(A)-[:Like]->(A),
+(A)-[:Like]->(D),
+(J)-[:Like]->(AB),
+(S)-[:Like]->(K),
+(S)-[:Like]->(D),
+(F)-[:Like]->(A);
+
+
+CREATE 
+(A:Male { name : "Alex"}),
+(B:Male { name : "Bob"}), 
+(F:Male { name: "Fred"}),
+(K:Female { name : "Karthike"}),
+(D:Female { name : "Dhwanishe"}),
+(J:Male { name : "Jigar"}),
+(AB:Male { name : "Abhishek"}),
+(S:Female { name : "Snigdha"}),
+(X:Male { name : "X"}),
+(Y:Male { name : "Y"}),
+(Z:Male { name : "Z"}),
+(A)-[:Parent_Of]->(B), 
+(A)-[:Parent_Of]->(F),  
+(F)-[:Parent_Of]->(K), 
+(F)-[:Parent_Of]->(D),  
+(F)-[:Parent_Of]->(J),
+(F)-[:Parent_Of]->(AB), 
+(S)-[:Parent_Of]->(X), 
+(X)-[:Parent_Of]->(Y),
+(Z)-[:Parent_Of]->(A),
+(B)-[:Like]->(F),
+(K)-[:Like]->(D),
+(K)-[:Like]->(J),
+(J)-[:Like]->(D),
+(AB)-[:Like]->(K),
+(X)-[:Like]->(Y),
+(Y)-[:Like]->(X),
+(J)-[:Like]->(AB),
+(S)-[:Like]->(K),
+(S)-[:Like]->(D),
+(J)-[:Like]->(K),
+(F)-[:Like]->(A);
+
+match(n) 
+detach delete n;
+
+match(n)
+return n;
+
+
+//query 1
+MATCH
+(a{name:'Alice'})-[:Parent_Of]->(b)-[:Like]->(a)
+RETURN b.name
+ORDER BY b.name ASC;
+
+//query 2
+MATCH (n:Female)
+WHERE NOT (n:Female)-[:Like]->(:Female{name:'Alice'})
+RETURN n.name
+ORDER BY n.name ASC;
+
+//query 3
+MATCH((n)-[:Like]->(b))
+WITH b.name AS bname,count(*) AS count
+ORDER BY count DESC,bname ASC
+LIMIT 1
+RETURN bname;
+
+//query 4
+MATCH (a)-[:Parent_Of*1..]->(b:Male)
+WITH b.name as bname,collect(a.name) as Ancestors
+ORDER BY bname ASC
+RETURN bname,Ancestors;
+
+//query 5
+MATCH (b)<-[:Parent_Of]-(c)-[:Parent_Of]->(a)
+WHERE (a)-[:Like]->(b)
+RETURN a.name,collect(b.name)
+ORDER BY a.name;
